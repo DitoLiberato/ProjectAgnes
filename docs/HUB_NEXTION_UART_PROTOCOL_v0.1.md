@@ -1,41 +1,41 @@
 # AGNES HUB-Nextion UART Protocol v0.1
 
-## 1. Objetivo
+## 1) Objective
 
-Definir o protocolo de comunicação entre HUB (ESP32-S3) e tela Nextion para:
+Define the communication protocol between HUB (ESP32-S3) and Nextion HMI for:
 
-- exibição clínica em tempo real (ECG, PPG, HR, SpO₂);
-- contexto operacional (estado AGNES, razões, conectividade);
-- painel térmico zonal em baixa frequência;
-- ações simples do operador (ack, navegação, checagem técnica).
-
----
-
-## 2. Premissas técnicas (MVP)
-
-- Meio físico: UART dedicado HUB↔Nextion.
-- Baudrate inicial recomendado: 115200 (avaliar 230400 se necessário).
-- Protocolo de comando: instruções Nextion enviadas pelo HUB.
-- Terminador padrão Nextion: `0xFF 0xFF 0xFF` ao final de cada comando.
+- real-time clinical rendering (`ECG`, `PPG`, `HR`, `SpO₂`);
+- operational context (AGNES state, reasons, connectivity);
+- low-frequency zonal thermal panel updates;
+- basic operator actions (`ack`, navigation, technical checks).
 
 ---
 
-## 3. Modelo de telas (MVP)
+## 2) MVP technical assumptions
 
-## 3.1 Tela principal
+- Physical medium: dedicated UART between HUB and Nextion.
+- Initial baud rate: `115200` (evaluate `230400` if needed).
+- Command model: HUB sends Nextion commands.
+- Nextion terminator: `0xFF 0xFF 0xFF` after each command.
 
-Campos obrigatórios:
+---
 
-- Numéricos: `HR`, `SpO2`
-- Curva: `ECG`
-- Curva: `PPG`
-- Índice: `AgitationIndex (0-100)`
-- Estado AGNES: `CALM | CONFLICT | VALIDATED_EVENT | DEGRADED | CRITICAL_AUDIO`
-- Texto curto: `reason_code` + descrição resumida
+## 3) Screen model (MVP)
 
-## 3.2 Tela térmica zonal
+### 3.1 Main screen
 
-Mostrar valores por zona:
+Mandatory fields:
+
+- Numeric: `HR`, `SpO2`
+- Waveform: `ECG`
+- Waveform: `PPG`
+- Index: `AgitationIndex (0-100)`
+- AGNES state: `CALM | CONFLICT | VALIDATED_EVENT | DEGRADED | CRITICAL_AUDIO`
+- Short reason text: `reason_code` + concise description
+
+### 3.2 Zonal thermal screen
+
+Display per-zone values:
 
 - `head`
 - `upper_limbs_proximal`
@@ -45,161 +45,148 @@ Mostrar valores por zona:
 - `lower_limbs_proximal`
 - `lower_limbs_distal`
 
-Indicadores derivados:
+Derived indicators:
 
 - `core_periphery_delta_c`
-- `thermal_trend` (`rising`, `stable`, `falling`)
+- `thermal_trend` (`rising | stable | falling`)
+
+Refresh policy: default `60s`.
 
 ---
 
-## 4. Prioridade e taxa de atualização
+## 4) Outbound message model (HUB -> Nextion)
 
-Ordem de prioridade (do maior para o menor):
+All commands end with `0xFF 0xFF 0xFF`.
 
-1. Estado crítico e alarmes
-2. Curvas `ECG` e `PPG`
-3. Numéricos `HR` e `SpO2`
-4. `AgitationIndex`
-5. Térmico zonal
+### 4.1 State rendering
 
-Cadência recomendada:
+Example:
 
-- Estado/alarme: imediato por evento
-- ECG: 25-50 pontos/s (amostragem exibida, não sinal cru total)
-- PPG: 25-50 pontos/s
-- HR/SpO2: 1 Hz
-- Agitação: 2-4 Hz
-- Térmico zonal: 1 atualização a cada 60 s
+`state.txt="VALIDATED_EVENT"`
 
----
+Associated fields:
 
-## 5. Comandos HUB -> Nextion
+- `reason.txt`
+- `confidence.val` (0-100)
+- `latency.val` (ms)
+- `channel.txt` (`hmi | wearable_haptic | audio`)
 
-## 5.1 Estado AGNES
+### 4.2 Numeric updates
 
-Exemplo (texto de estado):
+Examples:
 
-- `state_txt.txt="CONFLICT"`
-- `reason_txt.txt="movement_artifact"`
+- `hr.val=132`
+- `spo2.val=96`
+- `agit.val=37`
 
-## 5.2 Numéricos vitais
+### 4.3 Waveform feed
 
-- `hr_val.val=132`
-- `spo2_val.val=96`
+Examples:
 
-## 5.3 Curvas
+- `add ecg,0,85`
+- `add ppg,0,63`
 
-Assumindo componentes waveform:
+Priority policy:
 
-- ECG: `add ecg_wave,0,<valor_0_255>`
-- PPG: `add ppg_wave,0,<valor_0_255>`
+1. ECG waveform
+2. PPG waveform
+3. Vital numerics
+4. State/reason fields
+5. Thermal panel
 
-## 5.4 Índice de agitação
+### 4.4 Connectivity summary
 
-- `agit_val.val=42`
-- `agit_bar.val=42`
+Examples:
 
-## 5.5 Térmico zonal
-
-Exemplos:
-
-- `t_head.txt="35.2"`
-- `t_thorax.txt="36.0"`
-- `t_abd.txt="35.8"`
-- `delta_txt.txt="3.4"`
-- `trend_txt.txt="falling"`
-
-## 5.6 Conectividade
-
-- `link_contact.val=1`
-- `link_env.val=1`
-- `link_hub.val=1`
-
-> Todo comando deve terminar com `0xFF 0xFF 0xFF`.
+- `node_wear.txt="OK"`
+- `node_env.txt="DEGRADED"`
+- `link.txt="ESP-NOW"`
 
 ---
 
-## 6. Eventos Nextion -> HUB
+## 5) Inbound message model (Nextion -> HUB)
 
-No MVP, eventos mínimos:
+Minimum command set:
 
 - `ack_event`
 - `mute_request`
-- `page_change`
+- `page_change:<id>`
 - `tech_check_request`
 
-Implementação prática:
+Each inbound command must include:
 
-- Cada botão Nextion envia token ASCII curto usando `prints`.
-- HUB recebe token serial e traduz para comando interno.
+- `ts_ms`
+- `operator_id` (or `unknown`)
+- `source_page`
 
-Exemplos de tokens:
+Example logical frame:
 
-- `EVT:ACK`
-- `EVT:MUTE`
-- `EVT:PAGE:THERMAL`
-- `EVT:TECHCHECK`
-
----
-
-## 7. Regras de segurança operacional
-
-- Nextion não decide lógica clínica; apenas apresenta e confirma ação humana.
-- `mute_request` nunca cancela evento crítico validado; só silencia sinal não crítico conforme política do HUB.
-- Toda ação do operador recebida via UART deve entrar no Black Box com timestamp.
+```json
+{
+  "cmd": "ack_event",
+  "ts_ms": 1700001000123,
+  "operator_id": "nurse_a",
+  "source_page": "main"
+}
+```
 
 ---
 
-## 8. Limitações conhecidas e mitigação
+## 6) Safety rules
 
-## 8.1 Gráfico térmico por imagem
-
-Limitação:
-
-- Nextion não é ideal para renderização de mapa térmico por pixel em alta taxa.
-
-Mitigação:
-
-- usar mapa corporal por zonas com números e indicador de tendência.
-
-## 8.2 Banda UART concorrente
-
-Limitação:
-
-- atualizações simultâneas de curvas e muitos textos podem gerar atraso visual.
-
-Mitigação:
-
-- fila de prioridade no HUB;
-- redução adaptativa da taxa de curvas em caso de congestionamento;
-- térmico desacoplado em 60 s.
-
-## 8.3 Coerência visual
-
-Limitação:
-
-- atualizações fora de ordem podem gerar inconsistência momentânea.
-
-Mitigação:
-
-- enviar pacote lógico em sequência fixa: estado -> numéricos -> curvas -> contexto -> térmico.
+- HMI input cannot cancel validated critical safety decisions.
+- `mute_request` is advisory and must be validated by HUB policy.
+- Every HMI-originated action must be logged in the append-only trail.
+- If UI desynchronization is detected, HUB must force a full re-render.
 
 ---
 
-## 9. Exemplo de ciclo de atualização (1 segundo)
+## 7) Error handling
 
-1. HUB envia estado AGNES (se houver mudança).
-2. HUB envia `HR/SpO2`.
-3. HUB envia lote de pontos ECG/PPG para 1 s.
-4. HUB envia `AgitationIndex`.
-5. A cada 60 ciclos, HUB envia atualização térmica zonal.
+### 7.1 UART write timeout
+
+- Retry command up to `N` times.
+- If retries fail, enter `DEGRADED` view and log communication fault.
+
+### 7.2 Invalid inbound command
+
+- Ignore payload.
+- Log parse error with raw frame hash.
+
+### 7.3 HMI unavailable
+
+- Keep decision engine running.
+- Continue silent routing where possible.
+- Escalate to `CRITICAL_AUDIO` only if safety policy requires.
 
 ---
 
-## 10. Critérios de aceite da integração UART
+## 8) Minimal telemetry for traceability
 
-- Tela exibe todos os campos obrigatórios sem travamento por 30 min de teste.
-- Estado AGNES muda corretamente em todos os cenários de validação.
-- Curvas ECG/PPG mantêm continuidade visual adequada para MVP.
-- Atualização térmica ocorre a cada 60 s com zonas corretas.
-- Eventos de operador (ACK/MUTE/PAGE/TECHCHECK) são recebidos e logados pelo HUB.
+For each rendered event, record:
+
+- `decision_id`
+- `state`
+- `reason_code`
+- `confidence`
+- `render_ts_ms`
+- `render_latency_ms`
+- `hmi_ack_ts_ms` (if received)
+
+---
+
+## 9) Validation checklist (MVP)
+
+- State transitions render correctly for all five AGNES states.
+- ECG/PPG waveform updates remain stable under continuous load.
+- Thermal panel updates do not starve waveform rendering.
+- `ack_event` and `mute_request` are parsed and logged.
+- HUB recovers from forced UART interruption with deterministic fallback.
+
+---
+
+## 10) Versioning and compatibility
+
+- Protocol version: `uart_proto_version = "0.1"`
+- Backward-incompatible changes require `0.x -> 0.y` bump and migration note.
+- Optional fields must be safely ignored by older parsers.

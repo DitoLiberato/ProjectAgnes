@@ -1,236 +1,237 @@
-# AGNES — Engineering Portfolio do MVP (v0.1)
+# AGNES — MVP Engineering Portfolio (v0.1)
 
-## 1) Propósito deste documento
+## 1) Purpose of this document
 
-Este arquivo registra as decisões de engenharia tomadas até aqui no AGNES MVP, com foco em:
+This file records the engineering decisions made so far in the AGNES MVP, with a focus on:
 
-- rastreabilidade técnica;
-- justificativa de design;
-- relação entre problema, solução e resultado observado;
-- apresentação de portfólio para indústria e academia.
+- technical traceability;
+- design rationale;
+- clear linkage between problems, solutions, and results;
+- portfolio-grade communication for industry and academia.
 
-Escopo temporal: até o marco de bootstrap do firmware multipacote no PlatformIO e validação de build dos três nós.
+Time scope: up to the PlatformIO multi-target firmware bootstrap milestone and successful build validation across the three nodes.
 
 ---
 
-## 2) Visão de produto do MVP
+## 2) MVP product view
 
-AGNES é um sistema de vigilância clínica **silent-first**, baseado em validação multimodal subtrativa.
+AGNES is a **silent-first** clinical vigilance architecture built on subtractive multimodal validation.
 
-Pipeline-alvo do MVP:
+Target pipeline:
 
 `Signal -> Evidence -> Event Candidate -> Veto/Promote -> Targeted Notification -> Record`
 
-Objetivo técnico desta fase:
+Technical objective of this phase:
 
-- estabelecer uma base reprodutível de desenvolvimento;
-- padronizar contrato de mensagens entre nós;
-- habilitar evolução incremental de lógica de fusão (Veto Engine) sem retrabalho estrutural.
-
----
-
-## 3) Decisões de design realizadas
-
-## D1 — Arquitetura distribuída de três nós
-
-**Decisão**
-
-- Separar funções em `wearable`, `environmental` e `hub`.
-
-**Racional**
-
-- Isolamento funcional facilita debug e validação experimental.
-- Aproxima a topologia ao cenário real de uso (fontes independentes de evidência).
-
-**Impacto**
-
-- Código base inicial criado e compilando em três ambientes independentes.
-
-## D2 — Framework embarcado e ferramenta de build
-
-**Decisão**
-
-- Usar ESP32 + Arduino Framework com PlatformIO.
-
-**Racional**
-
-- Cadeia de build estável e amplamente adotada na indústria.
-- Menor barreira de entrada para prototipagem rápida e colaboração.
-
-**Impacto**
-
-- Projeto com `platformio.ini` multiambiente e builds reproduzíveis no dev container.
-
-## D3 — Contrato de mensagens v0.1 orientado a envelope comum
-
-**Decisão**
-
-- Definir envelope obrigatório (`schema_version`, `msg_type`, `msg_id`, `ts_ms`, `node_id`, `seq`) + payload por tipo.
-
-**Racional**
-
-- Evitar acoplamento entre origem do dado e consumidor.
-- Garantir versionamento, ordenação e auditabilidade desde o primeiro dia.
-
-**Impacto**
-
-- API comum implementada em firmware para `heartbeat` e `evidence` com serialização JSON compacta.
-
-## D4 — Separação entre schema e implementação
-
-**Decisão**
-
-- Manter contrato em documento de engenharia e implementação em camada comum (`include` + `src/common`).
-
-**Racional**
-
-- Permite revisar protocolo sem quebrar imediatamente firmware.
-- Reduz duplicação e divergência entre nós.
-
-**Impacto**
-
-- Três firmwares passaram a emitir mensagens consistentes via mesma API.
-
-## D5 — Estratégia de bootstrap com telemetria sintética
-
-**Decisão**
-
-- Iniciar com payloads de exemplo (dados sintéticos) para validar pipeline de integração.
-
-**Racional**
-
-- Antecipar riscos de integração de protocolo e estados antes de conectar sensores reais.
-
-**Impacto**
-
-- MVP já demonstra formato de mensagens e ciclo de publicação periódica.
+- establish a reproducible development foundation;
+- standardize the node-to-hub message contract;
+- enable incremental evolution of fusion logic (Veto Engine) without structural rework.
 
 ---
 
-## 4) Problemas encontrados e como foram resolvidos
+## 3) Design decisions implemented
 
-## P1 — Ambiente de desenvolvimento bloqueado por virtualização/WSL/Docker
+## D1 — Three-node distributed architecture
 
-**Problema**
+**Decision**
 
-- Docker Desktop não subia e WSL estava inconsistente para fluxo de dev container.
+- Split responsibilities into `wearable`, `environmental`, and `hub` nodes.
 
-**Solução aplicada**
+**Rationale**
 
-- Ajustes de BIOS/UEFI para virtualização;
-- atualização e validação do WSL;
-- instalação da distro Ubuntu;
-- validação ponta a ponta com `docker version` e `hello-world`.
+- Functional isolation improves debugability and experimental validation.
+- Topology mirrors realistic deployment constraints and independent evidence sources.
 
-**Resultado**
+**Impact**
 
-- Ambiente Linux de desenvolvimento estabilizado e pronto para build embarcado.
+- Three baseline firmware targets created and compiling independently.
 
-## P2 — Erro operacional ao colar conteúdo de arquivo `.ini` no shell
+## D2 — Embedded framework and build toolchain
 
-**Problema**
+**Decision**
 
-- Bash tentou executar conteúdo de configuração como comandos.
+- Use ESP32 + Arduino framework with PlatformIO.
 
-**Solução aplicada**
+**Rationale**
 
-- Criação dos arquivos via redirecionamento correto (`cat <<EOF`) e validação posterior.
+- Stable and widely adopted toolchain.
+- Fast prototyping and lower onboarding friction for collaborators.
 
-**Resultado**
+**Impact**
 
-- `platformio.ini` válido e reconhecido pelo PlatformIO.
+- Multi-environment `platformio.ini` with reproducible builds in the dev container.
 
-## P3 — Commit inicial incluiu artefatos de build
+## D3 — v0.1 contract based on a mandatory envelope
 
-**Problema**
+**Decision**
 
-- Diretório `firmware/.pio` foi versionado indevidamente.
+- Enforce common envelope fields (`schema_version`, `msg_type`, `msg_id`, `ts_ms`, `node_id`, `seq`) plus type-specific payloads.
 
-**Solução aplicada**
+**Rationale**
 
-- Inclusão de regra no `.gitignore` para `firmware/.pio/`;
-- remoção dos artefatos do índice e emenda do commit.
+- Decouple producers from consumers.
+- Preserve versioning, ordering, and auditability from day one.
 
-**Resultado**
+**Impact**
 
-- Histórico limpo, repositório leve e prática compatível com engenharia profissional.
+- Shared firmware API implemented for `heartbeat` and `evidence` compact JSON messages.
+
+## D4 — Separation between specification and implementation
+
+**Decision**
+
+- Keep protocol in engineering docs and implement in a shared message layer (`include` + `src/common`).
+
+**Rationale**
+
+- Protocol review can evolve without immediate firmware breakage.
+- Avoid duplicated serialization logic across node applications.
+
+**Impact**
+
+- All three firmware targets now publish protocol-consistent messages through the same API.
+
+## D5 — Synthetic telemetry bootstrap strategy
+
+**Decision**
+
+- Start with synthetic payloads to validate integration and message flow before real sensor wiring.
+
+**Rationale**
+
+- Reduces early integration risk and verifies architecture assumptions sooner.
+
+**Impact**
+
+- MVP already demonstrates structured periodic publishing behavior aligned with schema v0.1.
 
 ---
 
-## 5) Resultados técnicos verificáveis até aqui
+## 4) Problems faced and applied solutions
 
-## Infraestrutura
+## P1 — Development stack blocked by virtualization/WSL/Docker issues
 
-- Dev container ativo em Ubuntu 24.04.x.
-- Docker funcional com engine Linux.
-- Fluxo de desenvolvimento reproduzível no workspace.
+**Problem**
+
+- Docker Desktop startup and WSL consistency issues blocked containerized workflow.
+
+**Applied solution**
+
+- BIOS/UEFI virtualization enablement;
+- WSL update and runtime validation;
+- Ubuntu distro installation;
+- Docker engine validation with `docker version` and `hello-world`.
+
+**Result**
+
+- Stable Linux-based development environment for embedded build execution.
+
+## P2 — Operational error when pasting `.ini` file content into shell
+
+**Problem**
+
+- Shell interpreted configuration lines as commands.
+
+**Applied solution**
+
+- File creation via correct redirection flow and post-creation validation.
+
+**Result**
+
+- Valid `platformio.ini` detected by PlatformIO and builds executed successfully.
+
+## P3 — Build artifacts accidentally committed
+
+**Problem**
+
+- `firmware/.pio` build artifacts were tracked in git.
+
+**Applied solution**
+
+- Add `firmware/.pio/` to `.gitignore`;
+- remove artifacts from index;
+- amend commit.
+
+**Result**
+
+- Clean history, lighter repository, and professional SCM hygiene.
+
+---
+
+## 5) Verifiable technical results to date
+
+## Infrastructure
+
+- Dev container running on Ubuntu 24.04.x.
+- Docker engine operational with Linux backend.
+- Reproducible local workflow in the project workspace.
 
 ## Firmware
 
-- Estrutura `firmware/` organizada por nó e camada comum.
-- Três ambientes PlatformIO compilando com sucesso:
+- `firmware/` structure organized by node plus shared layer.
+- Successful builds for all three PlatformIO environments:
   - `wearable_esp32`
   - `environmental_esp32`
   - `hub_esp32`
 
-## Protocolo
+## Protocol
 
-- Envelope comum implementado no código.
-- Tipos `heartbeat` e `evidence` operacionalizados em todos os nós.
-- IDs e sequência por nó preparados para rastreabilidade.
+- Common envelope implemented in code.
+- `heartbeat` and `evidence` message types operationalized across all nodes.
+- Per-node sequencing and deterministic message IDs enabled for traceability.
 
 ---
 
-## 6) Entregáveis de código desta etapa
+## 6) Delivered artifacts in this phase
 
-- Base PlatformIO multiambiente (`firmware/platformio.ini`).
-- Firmwares iniciais para os três nós.
-- Camada comum de mensagens:
+- PlatformIO multi-target base (`firmware/platformio.ini`).
+- Initial firmware applications for the three nodes.
+- Shared message layer:
   - `firmware/include/agnes_messages.h`
   - `firmware/src/common/agnes_messages.cpp`
-- Publicação periódica de mensagens sintéticas alinhadas ao schema v0.1.
+- Periodic synthetic message emission aligned with schema v0.1.
 
 ---
 
-## 7) Trade-offs assumidos no MVP
+## 7) MVP trade-offs
 
-- **JSON no transporte MVP**: mais legível e auditável; menos eficiente que binário.
-- **Arduino framework**: acelera protótipo; menor controle fino que stack bare-metal/IDF pura.
-- **Dados sintéticos primeiro**: acelera integração de arquitetura; adia validação de ruído real de sensores.
-- **Escopo enxuto**: prioriza prova de conceito reprodutível sobre completude funcional clínica.
-
----
-
-## 8) Valor de portfólio (indústria e academia)
-
-Este MVP já demonstra competências transferíveis:
-
-- engenharia de sistemas embarcados distribuídos;
-- definição e governança de contratos de dados;
-- decisões de arquitetura orientadas a segurança e auditabilidade;
-- disciplina de versionamento e higiene de repositório;
-- capacidade de transformar conceito clínico em artefato técnico executável.
+- **JSON payloads in MVP**: better readability and auditability; less efficient than binary encoding.
+- **Arduino framework**: faster prototyping; less low-level control than pure ESP-IDF.
+- **Synthetic-first telemetry**: accelerates architecture validation; delays real-signal noise characterization.
+- **Strict MVP scope**: prioritizes reproducible proof-of-concept over full clinical feature coverage.
 
 ---
 
-## 9) Próximos marcos recomendados
+## 8) Portfolio value (industry and academia)
 
-1. Implementar transporte real ESP-NOW usando o envelope comum.
-2. Conectar sensores reais por nó e preencher campos de qualidade/confiança com critérios explícitos.
-3. Implementar `event_candidate` e `decision_record` no HUB.
-4. Persistir trilha append-only local (Black Box) com serialização estável.
-5. Criar harness de replay para cenários de validação do Veto Engine.
+The current MVP demonstrates transferable engineering competencies:
+
+- distributed embedded systems design;
+- contract-driven communication and protocol governance;
+- safety-oriented architecture choices with auditability constraints;
+- source control discipline and repository hygiene;
+- ability to translate clinical concepts into executable technical artifacts.
 
 ---
 
-## 10) Conclusão
+## 9) Recommended next milestones
 
-Até este ponto, o AGNES MVP saiu do nível conceitual para uma base executável, versionada e verificável.
+1. Implement real ESP-NOW transport using the common envelope.
+2. Integrate real sensor data paths and calibrate quality/confidence criteria.
+3. Implement `event_candidate` and `decision_record` in HUB logic.
+4. Persist append-only local Black Box records with stable serialization.
+5. Add replay harness for scenario-driven Veto Engine validation.
 
-O projeto já possui:
+---
 
-- arquitetura de nós definida e compilável;
-- contrato de comunicação inicial implementado;
-- evidência concreta de evolução técnica com decisões justificadas.
+## 10) Conclusion
 
-Isso caracteriza um **marco de engenharia sólido de fase 1**, adequado como cartão de visitas técnico para discussão com times de P&D, grupos acadêmicos e recrutadores de sistemas embarcados/healthtech.
+At this point, AGNES MVP has progressed from concept documentation to an executable, versioned, and verifiable technical baseline.
+
+The project now has:
+
+- a compilable multi-node architecture;
+- an initial implemented communication contract;
+- explicit, traceable engineering decisions with measurable outcomes.
+
+This marks a **solid Phase-1 engineering milestone**, suitable as a technical portfolio artifact for discussions with R&D teams, academic groups, and embedded/healthtech recruiters.

@@ -1,81 +1,81 @@
 # AGNES MVP Engineering Plan (v0.1)
 
-## 1) Objetivo do MVP
+## 1) MVP Objective
 
-Provar, de forma demonstrável e reprodutível, que a arquitetura AGNES (silent-first + validação subtrativa multimodal) reduz alarmes falsos sem perder detecção de eventos críticos relevantes.
+Provide a demonstrable and reproducible proof that AGNES (silent-first + subtractive multimodal validation) can reduce false alarms without losing relevant critical-event sensitivity.
 
-### Hipótese central
+### Core hypothesis
 
-A convergência entre fontes independentes de evidência melhora a qualidade da decisão clínica digital quando comparada ao modelo tradicional baseado em limiares isolados.
+Convergence of independent evidence sources improves decision quality compared to threshold-only alarm logic.
 
-### Critérios de sucesso
+### Success criteria
 
-- Redução de falsos positivos em comparação ao baseline threshold-only.
-- Preservação de sensibilidade em eventos críticos simulados.
-- Latência ponta-a-ponta adequada para demonstração de vigilância em tempo real.
-- 100% dos eventos com trilha de decisão auditável (promoção, veto ou incerteza).
-
----
-
-## 2) Escopo do MVP
-
-### Incluído
-
-- Pipeline AGNES completo: `Signal -> Evidence -> Event Candidate -> Veto/Promote -> Targeted Notification -> Record`.
-- Três nós físicos funcionais com comunicação local.
-- HMI silenciosa com explicabilidade de decisão.
-- Registro append-only local (Clinical Black Box).
-- Protocolo de validação com cenários simulados.
-
-### Fora de escopo (MVP)
-
-- Produto regulado para uso clínico real.
-- Diagnóstico automatizado.
-- Infraestrutura cloud obrigatória e integração com prontuário.
-- Modelos avançados de IA/ML como dependência principal.
+- Reduced false-positive rate versus threshold-only baseline.
+- Preserved sensitivity in simulated critical events.
+- End-to-end latency compatible with real-time vigilance demonstrations.
+- 100% of decisions recorded with an auditable rationale trail.
 
 ---
 
-## 3) Arquitetura de referência (definida)
+## 2) MVP Scope
 
-## Topologia de hardware
+### In scope
 
-1. **HUB:** ESP32-S3 (placa dedicada)
-   - Fusão de evidências
+- Complete AGNES pipeline: `Signal -> Evidence -> Event Candidate -> Veto/Promote -> Targeted Notification -> Record`.
+- Three functional physical nodes with local communication.
+- Silent-first HMI with explainable state transitions.
+- Local append-only record (Clinical Black Box).
+- Validation protocol with representative simulated scenarios.
+
+### Out of scope (MVP)
+
+- Certified medical product for real clinical deployment.
+- Autonomous diagnosis.
+- Mandatory cloud stack and EHR integration.
+- Advanced AI/ML models as core dependency.
+
+---
+
+## 3) Reference Architecture
+
+### Hardware topology
+
+1. **HUB: ESP32-S3**
+   - Evidence fusion
    - Veto Engine
-   - Roteamento de alertas silenciosos
-   - Gerenciamento da HMI Nextion (controle e visualização de estado)
-   - Acionamento de áudio como exceção crítica
-   - Registro local append-only
+   - Silent-notification routing
+   - Nextion HMI control and state rendering
+   - Audio escalation only for validated critical exceptions
+   - Local append-only logging
 
-2. **Nó de contato wearable:** XIAO ESP32-C3
+2. **Wearable contact node: XIAO ESP32-C3**
    - `AD8232` (ECG)
    - `MAX30102` (PPG/SpO₂)
    - `MPU6050` (IMU)
 
-3. **Nó ambiental:** ESP32-S3
-   - `mmWave` (respiração + dados de movimento no ambiente/paciente)
-   - `MLX90640` (gradientes térmicos e tendência hemodinâmica)
+3. **Environmental node: ESP32-S3**
+   - `mmWave` (respiration and movement context)
+   - `MLX90640` (thermal gradients and hemodynamic trend clues)
 
-## Comunicação
+### Communication
 
-- Primária: ESP-NOW entre nós.
-- Secundária: serial para debug e captura de logs de bancada.
+- Primary: ESP-NOW.
+- Secondary: serial channel for bench debugging and capture.
 
-## HMI
+### HMI
 
-- **Nextion Intelligent Series** no HUB como interface principal de controle e output visual, equivalente funcional ao monitor atual, com filosofia silent-first.
-- Estados mínimos exibidos: `CALM`, `CONFLICT`, `VALIDATED_EVENT`, `DEGRADED`, `CRITICAL_AUDIO`.
-- Exibir sempre: estado atual, motivo da decisão, sensores de suporte/conflito, nível de confiança e canal de notificação acionado.
+- **Nextion Intelligent Series** as the main visual/interaction console.
+- Minimum states: `CALM`, `CONFLICT`, `VALIDATED_EVENT`, `DEGRADED`, `CRITICAL_AUDIO`.
+- Always display: current state, decision reason, supporting/conflicting signals, confidence, and active notification channel.
 
-### Conteúdo clínico visual obrigatório (MVP)
+### Mandatory clinical visual content (MVP)
 
-- Numéricos: `SpO₂ (%)` e `Heart Rate (bpm)`.
-- Curvas: `PPG plethysmography` e `ECG waveform`.
-- Índice de agitação do paciente (`0-100`) baseado em fusão `IMU + mmWave`.
-- Mapa térmico corporal por zonas com dados processados (sem envio de frame bruto da câmera).
+- Numeric: `SpO₂ (%)`, `Heart Rate (bpm)`
+- Curves: `PPG pleth`, `ECG waveform`
+- Agitation index (`0-100`) based on `IMU + mmWave`
+- Zonal thermal body-map derived values (no raw frame streaming)
 
-### Zonas térmicas corporais (MVP)
+### Thermal body zones (MVP)
 
 - `head`
 - `upper_limbs_proximal`
@@ -85,221 +85,164 @@ A convergência entre fontes independentes de evidência melhora a qualidade da 
 - `lower_limbs_proximal`
 - `lower_limbs_distal`
 
-### Política de atualização de dados na HMI
+### HMI update policy
 
-- `ECG waveform`: alta prioridade e atualização contínua.
-- `PPG waveform`: alta prioridade e atualização contínua.
-- Numéricos (`HR`, `SpO₂`): atualização periódica rápida.
-- Índice de agitação: atualização periódica intermediária.
-- Painel térmico zonal: atualização lenta por tendência, padrão `60s`.
+- `ECG`: continuous high-priority updates
+- `PPG`: continuous high-priority updates
+- `HR`/`SpO₂`: fast periodic updates
+- Agitation index: medium periodic updates
+- Thermal panel: slow trend update, default `60s`
 
-### Interface HUB <-> Nextion (requisito MVP)
+### HUB <-> Nextion interface requirements (MVP)
 
-- Canal: UART dedicado.
-- Modelo de dados: mensagens curtas orientadas a estado (ex.: `state`, `reason_code`, `confidence`, `latency_ms`).
-- Comandos de entrada da HMI (mínimo): `ack_event`, `mute_request`, `page_change`, `tech_check_request`.
-- Comandos de saída do HUB (mínimo): `render_state`, `render_reason`, `render_priority`, `render_connectivity`.
-- Regra de segurança: interface visual nunca suprime decisão crítica; apenas confirma ciência operacional.
-
-### Limitações técnicas e mitigação (HMI)
-
-- Limitação: renderização de mapa térmico por pixel em Nextion pode degradar desempenho e estabilidade.
-   - Mitigação: transmitir apenas temperaturas por zona e indicadores derivados.
-- Limitação: concorrência de banda UART entre curvas e painéis auxiliares.
-   - Mitigação: priorização de `ECG/PPG` e atualização térmica desacoplada em baixa frequência.
-- Limitação: interpretação térmica isolada pode induzir leitura clínica indevida.
-   - Mitigação: tratar térmica como evidência contextual complementar no Veto Engine.
+- Dedicated UART link.
+- Short state-oriented messages (`state`, `reason_code`, `confidence`, `latency_ms`).
+- Minimum HMI input commands: `ack_event`, `mute_request`, `page_change`, `tech_check_request`.
+- Minimum HUB output commands: `render_state`, `render_reason`, `render_priority`, `render_connectivity`.
+- Safety rule: UI interaction never suppresses validated critical safety decisions.
 
 ---
 
-## 4) Papel clínico-técnico dos sensores
+## 4) Sensor roles and authority model
 
-- **ECG (AD8232):** alta autoridade para ritmo cardíaco e confirmação elétrica.
-- **PPG (MAX30102):** complemento cardiovascular (FC/SpO₂), suscetível a artefatos de movimento.
-- **IMU (MPU6050):** contexto cinemático local do wearable (agitação, handling, deslocamento).
-- **mmWave:** dupla função no MVP:
-  - detecção de padrão respiratório/micro-movimento torácico;
-  - captação de movimento como evidência contextual independente em apoio ao IMU.
-- **MLX90640:** evidência térmica complementar para gradiente core-periferia e tendência de instabilidade hemodinâmica.
+- **ECG (AD8232)**: high-authority rhythm validation.
+- **PPG (MAX30102)**: cardiovascular complement (HR/SpO₂), motion-sensitive.
+- **IMU (MPU6050)**: wearable kinematic context (agitation/handling/movement).
+- **mmWave**: respiration pattern and independent motion context.
+- **MLX90640**: thermal context for core-periphery trend clues.
 
-### Regra de autoridade no MVP
+### Authority rule (MVP)
 
-- Nenhum sensor isolado define evento crítico de forma definitiva.
-- Eventos críticos exigem convergência multimodal e qualidade mínima.
-- MLX90640 e mmWave podem elevar prioridade de investigação, mas com gates de qualidade.
+- No single sensor can unilaterally confirm a critical event.
+- Critical events require multimodal convergence with minimum quality gates.
+- mmWave/thermal can raise investigation priority but cannot independently close diagnosis.
 
 ---
 
-## 5) Contrato de dados (schema lógico v0.1)
+## 5) Logical data contract (v0.1)
 
-## Evidence (unidade mínima de inferência)
+### Evidence (minimum inference unit)
 
-Campos obrigatórios:
+Mandatory fields:
 
 - `event_id` (uuid)
 - `timestamp_ms` (epoch)
 - `node_id` (`wearable_contact`, `environmental`, `hub`)
 - `sensor_type` (`ecg`, `ppg`, `imu`, `mmwave`, `thermal`)
 - `signal_type` (`electrical`, `optical`, `mechanical`, `thermal`)
-- `value` (numérico ou objeto simples)
-- `quality_score` (0.0-1.0)
-- `confidence_score` (0.0-1.0)
-- `context_tags` (lista; ex.: `movement_high`, `lead_off`, `occlusion`, `stable_rest`)
+- `value` (numeric or simple object)
+- `quality_score` (`0.0-1.0`)
+- `confidence_score` (`0.0-1.0`)
+- `context_tags` (e.g., `movement_high`, `lead_off`, `stable_rest`)
 
-## EventCandidate
+### EventCandidate
 
-- `candidate_type` (ex.: `tachy_suspect`, `desat_suspect`, `apnea_suspect`, `shock_pattern_suspect`)
-- `supporting_evidence_ids` (lista)
-- `conflicting_evidence_ids` (lista)
+- `candidate_type`
+- `supporting_evidence_ids`
+- `conflicting_evidence_ids`
 - `temporal_window_ms`
-- `candidate_score` (0.0-1.0)
+- `candidate_score`
 
-## DecisionRecord (Black Box)
+### DecisionRecord (Black Box)
 
 - `decision_id`
 - `candidate_id`
 - `decision` (`promote`, `veto`, `hold`, `degraded_mode`)
-- `reason_code` (ex.: `movement_artifact`, `lead_disconnected`, `multimodal_convergence`, `insufficient_quality`)
-- `explanation_text` (curto e legível para humano)
+- `reason_code`
+- `explanation_text`
 - `notified_channels` (`hmi`, `wearable_haptic`, `audio`)
 - `latency_ms`
 
 ---
 
-## 6) Veto Engine v1 (determinístico e explicável)
+## 6) Veto Engine v1 (deterministic and explainable)
 
-## Princípios
+### Principles
 
-- Segurança por consenso, não por gatilho isolado.
-- Supressão explícita de conflitos com justificativa.
-- Escalonamento sonoro apenas em criticidade validada ou falha sistêmica.
+- Consensus-driven safety, not single-threshold triggering.
+- Explicit conflict suppression with documented rationale.
+- Audio escalation only for validated criticality or systemic observability loss.
 
-## Regras-base
+### Base rules
 
-1. **Promoção de evento crítico**
-   - Exigir pelo menos 2 fontes independentes coerentes.
-   - Exigir `quality_score` e `confidence_score` acima dos limiares mínimos por sensor.
+1. **Critical event promotion**
+   - At least two coherent independent sources.
+   - Sensor-specific minimum quality/confidence gates.
 
-2. **Veto por artefato de movimento**
-   - Exemplo: PPG alterado + IMU alto movimento + mmWave indicando movimento não compatível com piora fisiológica primária.
+2. **Motion artifact veto**
+   - Example: altered PPG + high IMU motion + non-supportive mmWave context.
 
-3. **Veto técnico**
-   - Exemplo: `lead_off` do ECG ativo em cenário de suposta assistolia.
+3. **Technical veto**
+   - Example: ECG lead-off under suspected asystole.
 
-4. **Hold (incerteza)**
-   - Sem convergência suficiente: manter monitoramento, notificar silenciosamente e registrar conflito.
+4. **Hold state (uncertainty)**
+   - No convergence: continue monitoring, notify silently, register conflict.
 
-5. **Escalonamento de áudio (exceção)**
-   - Criticidade alta + convergência robusta,
-   - ou perda de observabilidade relevante (degradação sistêmica).
-
----
-
-## 7) Estados operacionais do sistema
-
-- `CALM`: sem eventos relevantes, sinais consistentes.
-- `CONFLICT`: inconsistência entre fontes, possível artefato.
-- `VALIDATED_EVENT`: evento confirmado multimodalmente.
-- `DEGRADED`: perda parcial de sensores/comunicação; monitoramento reduzido com transparência.
-- `CRITICAL_AUDIO`: exceção sonora habilitada por regra de segurança.
-
-### Mapeamento visual na Nextion (MVP)
-
-- Cada estado deve ter tela dedicada e inequívoca.
-- Toda mudança de estado deve registrar timestamp e razão no Black Box.
-- Transições `CONFLICT -> CALM` e `VALIDATED_EVENT -> CALM` exigem atualização explícita de resolução.
+5. **Audio escalation (exception)**
+   - High criticality + robust convergence, or major observability degradation.
 
 ---
 
-## 8) Cenários de validação (MVP)
+## 7) Operational states
 
-1. **Artefato por agitação**
-   - Esperado: veto com razão `movement_artifact`.
+- `CALM`: stable and coherent signals.
+- `CONFLICT`: source inconsistency/artifact suspicion.
+- `VALIDATED_EVENT`: multimodal confirmation reached.
+- `DEGRADED`: partial sensing/communication loss.
+- `CRITICAL_AUDIO`: audible escalation enabled by safety rule.
 
-2. **Desconexão de ECG**
-   - Esperado: veto com razão `lead_disconnected` e alerta técnico silencioso.
+### Nextion visual mapping
 
-3. **Taquicardia real em repouso**
-   - Esperado: promoção por convergência ECG+PPG com baixo movimento IMU/mmWave.
-
-4. **Apneia simulada com dessaturação**
-   - Esperado: promoção crítica com possibilidade de `CRITICAL_AUDIO`.
-
-5. **Padrão térmico de alerta hemodinâmico**
-   - Esperado: `hold` ou alerta de reavaliação com razão explícita, sem diagnóstico automático.
-
-6. **Falha de nó/sensor**
-   - Esperado: entrada em `DEGRADED` com rastreabilidade e limites operacionais claros.
+- Dedicated unambiguous view per state.
+- Every state transition logged with timestamp and reason.
+- `CONFLICT -> CALM` and `VALIDATED_EVENT -> CALM` require explicit resolution update.
 
 ---
 
-## 9) Métricas de avaliação
+## 8) Validation scenarios (MVP)
 
-- Taxa de falso positivo por cenário.
-- Sensibilidade em eventos críticos simulados.
-- Latência mediana e p95 por tipo de decisão.
-- Taxa de eventos com explicação registrada.
-- Disponibilidade da comunicação entre nós.
-- Integridade de renderização HMI (campos obrigatórios e curvas sem perda perceptível).
-- Confiabilidade da atualização térmica zonal no ciclo de `60s`.
+1. **Agitation artifact**
+   - Expected: veto with `movement_artifact` reason.
 
----
+2. **ECG disconnection**
+   - Expected: veto with `lead_disconnected` plus silent technical notice.
 
-## 10) Riscos e mitigação
+3. **Real resting tachycardia**
+   - Expected: promotion via ECG+PPG convergence with low movement context.
 
-1. **Ruído no ECG em wearable compacto**
-   - Mitigação: layout, aterramento, cabos curtos, filtro digital, eventual ADC externo.
+4. **Simulated apnea with desaturation**
+   - Expected: critical promotion, with possible `CRITICAL_AUDIO` escalation.
 
-2. **Variação térmica ambiental (MLX90640)**
-   - Mitigação: janela de calibração, controle de distância/FOV, gate de qualidade térmica.
+5. **Thermal hemodynamic-risk pattern**
+   - Expected: `hold` or re-evaluation notice with explicit rationale.
 
-3. **Conflitos de movimento (IMU vs mmWave)**
-   - Mitigação: regras de contexto temporal e score de coerência cruzada.
-
-4. **Sincronização temporal entre nós**
-   - Mitigação: sincronização periódica e janelas de fusão fixas.
-
-5. **Complexidade excessiva no MVP**
-   - Mitigação: regras simples, explicáveis, com evolução incremental.
+6. **Node/sensor failure**
+   - Expected: `DEGRADED` state with clear operational limits.
 
 ---
 
-## 11) Cronograma sugerido (8 semanas)
+## 9) Evaluation metrics
 
-- **S1-S2:** schema de dados, logger append-only, testes de comunicação.
-- **S3-S4:** integração dos nós (contato + ambiental) e aquisição estável.
-- **S5:** implementação Veto Engine v1 + códigos de razão.
-- **S6:** integração HMI silenciosa e canais de notificação.
-- **S7:** protocolo de validação com baseline threshold-only.
-- **S8:** consolidação de métricas, demonstração e relatório de candidatura a laboratório.
-
----
-
-## 12) Entregáveis do MVP
-
-1. Protótipo com 3 nós operacionais.
-2. Pipeline AGNES funcional ponta-a-ponta.
-3. Integração HUB-Nextion com estados, razões e comandos mínimos de operação.
-4. Black Box local em JSONL.
-5. Demonstração de cenários com resultados mensuráveis.
-6. Relatório técnico com limitações, riscos e próximos passos.
+- False-positive rate per scenario.
+- Sensitivity in simulated critical scenarios.
+- Decision latency (median and p95).
+- Ratio of events with explicit recorded explanation.
+- Inter-node communication availability.
+- HMI rendering integrity (required fields and stable curves).
+- Thermal zonal refresh reliability at `60s` cadence.
 
 ---
 
-## 13) Critérios de aceite do ciclo MVP
+## 10) Risks and mitigations
 
-- Comunicação entre nós estável durante sessão de teste.
-- Veto Engine toma decisões reproduzíveis para os cenários definidos.
-- Logs permitem reconstrução completa do raciocínio de decisão.
-- Demonstração evidencia redução de ruído de alarmes sem perda de eventos críticos simulados.
-- Nextion exibe corretamente estados e razões em todos os cenários definidos.
-- Material técnico apto para submissão/apresentação em laboratório acadêmico ou industrial.
+1. **ECG noise in compact wearable setup**
+   - Mitigation: layout hygiene, grounding, filtering, optional external ADC.
 
----
+2. **Environmental thermal variability (MLX90640)**
+   - Mitigation: calibration windows, distance/FOV control, thermal quality gating.
 
-## 14) Próxima evolução (após MVP)
+3. **Motion-context conflicts (IMU vs mmWave)**
+   - Mitigation: temporal coherence rules and cross-source consistency scoring.
 
-- Refinar pesos/limiares com dados reais supervisionados.
-- Incorporar modelo probabilístico leve para ranking de hipóteses.
-- Melhorar miniaturização e segurança elétrica para uso prolongado.
-- Expandir integração documental e trilhas para validação regulatória futura.
+4. **Inter-node time synchronization drift**
+   - Mitigation: periodic synchronization and fixed fusion windows.

@@ -1,15 +1,16 @@
 # AGNES (PojectAgnes)
 
-Agnostic Global Nodal Evidence System — arquitetura **silent-first** para monitoramento clínico com validação multimodal.
+Agnostic Global Nodal Evidence System — a **silent-first** architecture for clinical monitoring with multimodal validation.
 
-## Índice mestre
+## Master Index
 
-### Documentação de engenharia
+### Engineering Documentation
 
-- [Portfolio de Engenharia do MVP](docs/ENGINEERING_MVP_PORTFOLIO_v0.1.md)
-- [Plano de Engenharia do MVP](docs/ENGINEERING_MVP_PLAN.md)
+- [MVP Engineering Portfolio](docs/ENGINEERING_MVP_PORTFOLIO_v0.1.md)
+- [MVP Engineering Plan](docs/ENGINEERING_MVP_PLAN.md)
+- [Language Policy](docs/LANGUAGE_POLICY.md)
 
-### Contratos e protocolos
+### Contracts and Protocols
 
 - [Node-HUB Message Schema v0.1](docs/NODE_HUB_MESSAGE_SCHEMA_v0.1.md)
 - [HUB-Nextion UART Protocol v0.1](docs/HUB_NEXTION_UART_PROTOCOL_v0.1.md)
@@ -17,12 +18,12 @@ Agnostic Global Nodal Evidence System — arquitetura **silent-first** para moni
 ### Firmware
 
 - [Estrutura PlatformIO](firmware/platformio.ini)
-- [Nó Wearable](firmware/src/wearable/main.cpp)
-- [Nó Ambiental](firmware/src/environmental/main.cpp)
-- [Nó HUB](firmware/src/hub/main.cpp)
-- [Camada comum de mensagens](firmware/include/agnes_messages.h)
+- [Wearable Node](firmware/src/wearable/main.cpp)
+- [Environmental Node](firmware/src/environmental/main.cpp)
+- [HUB Node](firmware/src/hub/main.cpp)
+- [Shared Message Layer](firmware/include/agnes_messages.h)
 
-## Estado atual
+## Current Status
 
-- MVP em fase de base técnica consolidada (infra + firmware multipacote + contrato inicial de mensagens).
-- Próximo marco: integração ESP-NOW real + Veto Engine no HUB com trilha append-only.
+- MVP is in the consolidated technical foundation phase (infrastructure + multi-target firmware + initial message contract).
+- Next milestone: real ESP-NOW integration + HUB Veto Engine with an append-only record trail.

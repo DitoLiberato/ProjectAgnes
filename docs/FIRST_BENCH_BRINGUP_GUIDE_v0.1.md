@@ -113,8 +113,13 @@ Wearable board requirement:
 
 Environmental board requirement:
 
-- The environmental target is an `ESP32-S3-N16R8`.
-- In `firmware/platformio.ini`, `environmental_esp32` must use `board = esp32-s3-devkitc-1-n16r8`.
+- The environmental target is an `ESP32-S3-N8R2`.
+- In `firmware/platformio.ini`, `environmental_esp32` must use `board = esp32-s3-devkitc-1-n8r2`.
+
+HUB board requirement:
+
+- The HUB target is an `ESP32-S3-N16R8`.
+- In `firmware/platformio.ini`, `hub_esp32` must use `board = esp32-s3-devkitc-1-n16r8`.
 
 ---
 

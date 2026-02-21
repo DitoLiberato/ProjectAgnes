@@ -55,7 +55,8 @@ Before connecting boards:
 - [ ] Firmware path exists: `/workspaces/ProjectAgnes/firmware`
 - [ ] `platformio.ini` has the 3 environments
 - [ ] Wearable physical board is `Seeed XIAO ESP32-C3`
-- [ ] Environmental physical board is `ESP32-S3-N16R8`
+- [ ] Environmental physical board is `ESP32-S3-N8R2`
+- [ ] HUB physical board is `ESP32-S3-N16R8`
 - [ ] USB cables are known-good data cables
 - [ ] You can identify each board physically
 
@@ -232,11 +233,11 @@ Overall run:
 ## 11) Current bench status snapshot (2026-02-21)
 
 - [x] Wearable node (`wearable_esp32`) bench PASS
-- [x] Environmental node (`environmental_esp32`, ESP32-S3-N16R8) bench PASS
-- [ ] HUB node (`hub_esp32`) standalone bench PASS
+- [ ] HUB node (`hub_esp32`, ESP32-S3-N16R8) standalone bench PASS
+- [ ] Environmental node (`environmental_esp32`, ESP32-S3-N8R2) bench PASS after remap
 - [ ] Integrated multi-node bench (wearable + environmental + hub) PASS
 
 Notes:
 
-- Environmental node validated with `psram=ok` in boot log and heartbeat `sensor_status`.
-- Next gate is HUB standalone for ~5 minutes before integrated capture.
+- Environmental node was previously validated on N16R8 and now requires revalidation on N8R2 after hardware role remap.
+- Next gates are HUB standalone PASS (N16R8) and environmental PASS (N8R2) before integrated capture.

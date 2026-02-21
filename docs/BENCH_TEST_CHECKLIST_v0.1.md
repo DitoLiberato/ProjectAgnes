@@ -233,11 +233,11 @@ Overall run:
 ## 11) Current bench status snapshot (2026-02-21)
 
 - [x] Wearable node (`wearable_esp32`) bench PASS
-- [ ] HUB node (`hub_esp32`, ESP32-S3-N16R8) standalone bench PASS
-- [ ] Environmental node (`environmental_esp32`, ESP32-S3-N8R2) bench PASS after remap
+- [x] HUB node (`hub_esp32`, ESP32-S3-N16R8) standalone bench PASS
+- [x] Environmental node (`environmental_esp32`, ESP32-S3-N8R2) bench PASS after remap
 - [ ] Integrated multi-node bench (wearable + environmental + hub) PASS
 
 Notes:
 
-- Environmental node was previously validated on N16R8 and now requires revalidation on N8R2 after hardware role remap.
-- Next gates are HUB standalone PASS (N16R8) and environmental PASS (N8R2) before integrated capture.
+- Environmental node revalidation on N8R2 completed with `psram=ok` and stable evidence stream.
+- Next gate is integrated multi-node bench capture (wearable + environmental + hub).

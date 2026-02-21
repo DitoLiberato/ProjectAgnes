@@ -13,6 +13,7 @@ Agnostic Global Nodal Evidence System — a **silent-first** architecture for cl
 - [Development Log — 2026-02-21 First Wearable Bench PASS](docs/DEVELOPMENT_LOG_2026-02-21_FIRST_WEARABLE_BENCH_PASS.md)
 - [Development Log — 2026-02-21 Environmental N16R8 Bench PASS](docs/DEVELOPMENT_LOG_2026-02-21_ENVIRONMENTAL_N16R8_BENCH_PASS.md)
 - [Development Log — 2026-02-21 Hardware Role Remap (N16R8 HUB / N8R2 ENV)](docs/DEVELOPMENT_LOG_2026-02-21_HARDWARE_ROLE_REMAP_N16R8_HUB_N8R2_ENV.md)
+- [Development Log — 2026-02-21 HUB N16R8 and ENV N8R2 Bench PASS](docs/DEVELOPMENT_LOG_2026-02-21_HUB_N16R8_AND_ENV_N8R2_BENCH_PASS.md)
 - [Language Policy](docs/LANGUAGE_POLICY.md)
 
 ### Contracts and Protocols
@@ -31,7 +32,7 @@ Agnostic Global Nodal Evidence System — a **silent-first** architecture for cl
 ## Current Status
 
 - MVP is in the consolidated technical foundation phase (infrastructure + multi-target firmware + initial message contract).
-- Bench status: wearable PASS; hardware roles remapped to HUB=N16R8 and ENV=N8R2; hub/environmental re-validation on remapped hardware pending.
-- Next milestone: hub standalone PASS (N16R8), environmental PASS (N8R2), then integrated multi-node run (wearable + environmental + hub), followed by real ESP-NOW integration + HUB Veto Engine with an append-only record trail.
+- Bench status: wearable PASS, hub PASS (N16R8), environmental PASS (N8R2).
+- Next milestone: integrated multi-node run (wearable + environmental + hub), followed by real ESP-NOW integration + HUB Veto Engine with an append-only record trail.
 
 

@@ -226,3 +226,17 @@ Overall run:
 - Final result: PASS/FAIL
 - Blocking issues:
 - Next action:
+
+---
+
+## 11) Current bench status snapshot (2026-02-21)
+
+- [x] Wearable node (`wearable_esp32`) bench PASS
+- [x] Environmental node (`environmental_esp32`, ESP32-S3-N16R8) bench PASS
+- [ ] HUB node (`hub_esp32`) standalone bench PASS
+- [ ] Integrated multi-node bench (wearable + environmental + hub) PASS
+
+Notes:
+
+- Environmental node validated with `psram=ok` in boot log and heartbeat `sensor_status`.
+- Next gate is HUB standalone for ~5 minutes before integrated capture.

@@ -1,4 +1,4 @@
-# AGNES (PojectAgnes)
+# AGNES (ProjectAgnes)
 
 Agnostic Global Nodal Evidence System — a **silent-first** architecture for clinical monitoring with multimodal validation.
 

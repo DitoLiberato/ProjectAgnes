@@ -45,14 +45,14 @@ Recommended physical labeling:
 In VS Code terminal, run:
 
 ```bash
-cd /workspaces/PojectAgnes
+cd /workspaces/ProjectAgnes
 pwd
 ```
 
 Expected output should end with:
 
 ```text
-/workspaces/PojectAgnes
+/workspaces/ProjectAgnes
 ```
 
 Now move into firmware folder:
@@ -65,7 +65,7 @@ pwd
 Expected output:
 
 ```text
-/workspaces/PojectAgnes/firmware
+/workspaces/ProjectAgnes/firmware
 ```
 
 ---
@@ -367,7 +367,7 @@ Those are next milestones after this bench baseline is stable.
 ## 15) Quick command summary (copy/paste)
 
 ```bash
-cd /workspaces/PojectAgnes/firmware
+cd /workspaces/ProjectAgnes/firmware
 pio --version
 pio device list
 pio run -e wearable_esp32 -e environmental_esp32 -e hub_esp32

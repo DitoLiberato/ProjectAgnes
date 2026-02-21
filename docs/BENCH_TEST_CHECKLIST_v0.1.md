@@ -35,7 +35,7 @@ Optional but useful:
 Quick check:
 
 ```bash
-cd /workspaces/PojectAgnes/firmware
+cd /workspaces/ProjectAgnes/firmware
 pio --version
 ```
 
@@ -45,8 +45,8 @@ pio --version
 
 Before connecting boards:
 
-- [ ] Workspace path is correct: `/workspaces/PojectAgnes`
-- [ ] Firmware path exists: `/workspaces/PojectAgnes/firmware`
+- [ ] Workspace path is correct: `/workspaces/ProjectAgnes`
+- [ ] Firmware path exists: `/workspaces/ProjectAgnes/firmware`
 - [ ] `platformio.ini` has the 3 environments
 - [ ] USB cables are known-good data cables
 - [ ] You can identify each board physically
@@ -60,7 +60,7 @@ Before upload:
 Port discovery command:
 
 ```bash
-cd /workspaces/PojectAgnes/firmware
+cd /workspaces/ProjectAgnes/firmware
 pio device list
 ```
 
@@ -77,7 +77,7 @@ Record mapping:
 Run once before first flash:
 
 ```bash
-cd /workspaces/PojectAgnes/firmware
+cd /workspaces/ProjectAgnes/firmware
 pio run -e wearable_esp32 -e environmental_esp32 -e hub_esp32
 ```
 
@@ -94,7 +94,7 @@ Pass criteria:
 ### Wearable upload
 
 ```bash
-cd /workspaces/PojectAgnes/firmware
+cd /workspaces/ProjectAgnes/firmware
 pio run -e wearable_esp32 -t upload --upload-port <WEARABLE_PORT>
 ```
 
@@ -103,7 +103,7 @@ pio run -e wearable_esp32 -t upload --upload-port <WEARABLE_PORT>
 ### Environmental upload
 
 ```bash
-cd /workspaces/PojectAgnes/firmware
+cd /workspaces/ProjectAgnes/firmware
 pio run -e environmental_esp32 -t upload --upload-port <ENV_PORT>
 ```
 
@@ -112,7 +112,7 @@ pio run -e environmental_esp32 -t upload --upload-port <ENV_PORT>
 ### Hub upload
 
 ```bash
-cd /workspaces/PojectAgnes/firmware
+cd /workspaces/ProjectAgnes/firmware
 pio run -e hub_esp32 -t upload --upload-port <HUB_PORT>
 ```
 
@@ -125,7 +125,7 @@ pio run -e hub_esp32 -t upload --upload-port <HUB_PORT>
 Open monitor for each board (one at a time):
 
 ```bash
-cd /workspaces/PojectAgnes/firmware
+cd /workspaces/ProjectAgnes/firmware
 pio device monitor -p <PORT> -b 115200
 ```
 

@@ -17,6 +17,7 @@ Define the communication protocol between HUB (ESP32-S3) and Nextion HMI for:
 - Initial baud rate: `115200` (evaluate `230400` if needed).
 - Command model: HUB sends Nextion commands.
 - Nextion terminator: `0xFF 0xFF 0xFF` after each command.
+- Development-mode inbound parser expects line-based text commands from Nextion (`\n`/`\r` terminated).
 
 ---
 
@@ -102,6 +103,28 @@ Examples:
 - `node_env.txt="DEGRADED"`
 - `link.txt="ESP-NOW"`
 
+### 4.5 MVP development fields currently implemented
+
+The HUB currently sends these component updates on each heartbeat cycle:
+
+- `proto.txt`
+- `state.txt`
+- `reason.txt`
+- `confidence.val`
+- `latency.val`
+- `node_wear.txt`
+- `node_env.txt`
+- `link.txt`
+- `uptime.val`
+- `page_id.val`
+- `cmd_count.val`
+- `ts_lsb.val`
+
+Boot-time fields also sent once:
+
+- `boot.txt="hub_boot_ok"`
+- `fw.txt="hub-0.1.0"`
+
 ---
 
 ## 5) Inbound message model (Nextion -> HUB)
@@ -112,6 +135,12 @@ Minimum command set:
 - `mute_request`
 - `page_change:<id>`
 - `tech_check_request`
+
+Current parser behavior:
+
+- Accepts plain text commands from UART line buffer.
+- Valid commands are logged by HUB to serial in JSON form.
+- Unknown commands are logged as `"hmi_cmd":"unknown"`.
 
 Each inbound command must include:
 

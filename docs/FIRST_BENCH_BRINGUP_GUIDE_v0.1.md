@@ -24,6 +24,15 @@ By the end of this guide, you will:
 
 ---
 
+## 2.1) Where to run each command (critical)
+
+- Use the **local host terminal** (Windows PowerShell/Linux/macOS terminal) for USB flashing and serial monitoring.
+- Use Codespaces terminal for repository editing and optional cloud builds.
+
+If your board is physically plugged into your computer USB port, assume flash/monitor commands must run locally.
+
+---
+
 ## 3) Safety and preparation (read fully before starting)
 
 - Use only USB data cables.
@@ -97,6 +106,11 @@ Confirm these environments exist:
 - `environmental_esp32`
 - `hub_esp32`
 
+Wearable board requirement:
+
+- The wearable target is a `Seeed XIAO ESP32-C3`.
+- In `firmware/platformio.ini`, `wearable_esp32` must use `board = seeed_xiao_esp32c3`.
+
 ---
 
 ## 7) Connect one board at a time and map ports
@@ -123,7 +137,7 @@ Copy this output into your notes as "baseline".
 pio device list
 ```
 
-Find the new port (for example `/dev/ttyUSB0` or `/dev/ttyACM0`).
+Find the new port (for example `/dev/ttyUSB0` or `/dev/ttyACM0` on Linux, or `COM5` on Windows).
 Write down:
 
 - `WEARABLE_PORT=<new port>`
@@ -188,6 +202,11 @@ pio run -e wearable_esp32 -t upload --upload-port <WEARABLE_PORT>
 
 Expected: upload completion message with no fatal error.
 
+If you see `This chip is ESP32-C3, not ESP32`, stop and verify:
+
+- wearable env uses `board = seeed_xiao_esp32c3`
+- you rebuilt after pulling latest changes
+
 If upload stalls:
 
 - Press and hold `BOOT` on board.
@@ -225,6 +244,12 @@ pio device monitor -p <PORT> -b 115200
 Exit monitor any time with:
 
 - `Ctrl+C`
+
+Important for Windows users:
+
+- `Ctrl+C` also interrupts live monitoring.
+- Do not use `Ctrl+C` while trying to copy evidence output.
+- Prefer mouse selection + `Enter` (or your terminal copy shortcut).
 
 ### 10.1 Wearable expected behavior
 
@@ -348,6 +373,16 @@ If one condition fails, mark **FAIL** and record exact failing step.
 
 - This is a valid diagnostic state for now.
 - Record it in logs and continue bench verification of serial behavior.
+
+## F) Upload error says chip mismatch (`ESP32-C3` vs `ESP32`)
+
+- Confirm wearable board config in `platformio.ini` is `seeed_xiao_esp32c3`.
+- Run clean + upload again.
+
+## G) Monitor appears frozen after copy attempt
+
+- Check if `Ctrl+C` was pressed accidentally.
+- Start monitor again and press board reset once.
 
 ---
 

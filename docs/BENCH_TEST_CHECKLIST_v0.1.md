@@ -31,6 +31,12 @@ Optional but useful:
 - VS Code with this repository opened
 - Dev container active
 - PlatformIO CLI available (`pio` command)
+- Local host terminal for USB flashing (recommended)
+
+Important execution rule:
+
+- Build commands can run in Codespaces.
+- USB flash/monitor should run on the local host terminal where the board is physically connected.
 
 Quick check:
 
@@ -48,6 +54,7 @@ Before connecting boards:
 - [ ] Workspace path is correct: `/workspaces/ProjectAgnes`
 - [ ] Firmware path exists: `/workspaces/ProjectAgnes/firmware`
 - [ ] `platformio.ini` has the 3 environments
+- [ ] Wearable physical board is `Seeed XIAO ESP32-C3`
 - [ ] USB cables are known-good data cables
 - [ ] You can identify each board physically
 
@@ -181,12 +188,14 @@ If upload fails:
 - [ ] Press board `BOOT` button during upload start (if required)
 - [ ] Replace cable with known data cable
 - [ ] Close other serial monitor tools using the same port
+- [ ] If error says `This chip is ESP32-C3, not ESP32`, confirm wearable env board is `seeed_xiao_esp32c3`
 
 If monitor shows no logs:
 
 - [ ] Confirm baud is `115200`
 - [ ] Press `EN`/`RST` button once
 - [ ] Verify correct board port
+- [ ] Ensure monitor was not interrupted by `Ctrl+C`
 
 If board resets repeatedly:
 

@@ -10,6 +10,7 @@ Agnostic Global Nodal Evidence System — a **silent-first** architecture for cl
 - [MVP Engineering Plan](docs/ENGINEERING_MVP_PLAN.md)
 - [Bench Test Checklist v0.1](docs/BENCH_TEST_CHECKLIST_v0.1.md)
 - [First Bench Bring-Up Guide v0.1](docs/FIRST_BENCH_BRINGUP_GUIDE_v0.1.md)
+- [Development Log — 2026-02-21 First Wearable Bench PASS](docs/DEVELOPMENT_LOG_2026-02-21_FIRST_WEARABLE_BENCH_PASS.md)
 - [Language Policy](docs/LANGUAGE_POLICY.md)
 
 ### Contracts and Protocols

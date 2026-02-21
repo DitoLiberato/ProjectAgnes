@@ -11,6 +11,7 @@ Agnostic Global Nodal Evidence System — a **silent-first** architecture for cl
 - [Bench Test Checklist v0.1](docs/BENCH_TEST_CHECKLIST_v0.1.md)
 - [First Bench Bring-Up Guide v0.1](docs/FIRST_BENCH_BRINGUP_GUIDE_v0.1.md)
 - [Development Log — 2026-02-21 First Wearable Bench PASS](docs/DEVELOPMENT_LOG_2026-02-21_FIRST_WEARABLE_BENCH_PASS.md)
+- [Development Log — 2026-02-21 Environmental N16R8 Bench PASS](docs/DEVELOPMENT_LOG_2026-02-21_ENVIRONMENTAL_N16R8_BENCH_PASS.md)
 - [Language Policy](docs/LANGUAGE_POLICY.md)
 
 ### Contracts and Protocols
@@ -29,6 +30,7 @@ Agnostic Global Nodal Evidence System — a **silent-first** architecture for cl
 ## Current Status
 
 - MVP is in the consolidated technical foundation phase (infrastructure + multi-target firmware + initial message contract).
-- Next milestone: real ESP-NOW integration + HUB Veto Engine with an append-only record trail.
+- Bench status: wearable PASS, environmental PASS (ESP32-S3-N16R8), hub standalone pending.
+- Next milestone: hub standalone PASS, then integrated multi-node run (wearable + environmental + hub), followed by real ESP-NOW integration + HUB Veto Engine with an append-only record trail.
 
 

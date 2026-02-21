@@ -111,6 +111,11 @@ Wearable board requirement:
 - The wearable target is a `Seeed XIAO ESP32-C3`.
 - In `firmware/platformio.ini`, `wearable_esp32` must use `board = seeed_xiao_esp32c3`.
 
+Environmental board requirement:
+
+- The environmental target is an `ESP32-S3-N16R8`.
+- In `firmware/platformio.ini`, `environmental_esp32` must use `board = esp32-s3-devkitc-1-n16r8`.
+
 ---
 
 ## 7) Connect one board at a time and map ports

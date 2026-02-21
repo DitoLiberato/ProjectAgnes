@@ -55,6 +55,7 @@ Before connecting boards:
 - [ ] Firmware path exists: `/workspaces/ProjectAgnes/firmware`
 - [ ] `platformio.ini` has the 3 environments
 - [ ] Wearable physical board is `Seeed XIAO ESP32-C3`
+- [ ] Environmental physical board is `ESP32-S3-N16R8`
 - [ ] USB cables are known-good data cables
 - [ ] You can identify each board physically
 

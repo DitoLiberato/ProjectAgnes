@@ -8,6 +8,8 @@ Agnostic Global Nodal Evidence System — a **silent-first** architecture for cl
 
 - [MVP Engineering Portfolio](docs/ENGINEERING_MVP_PORTFOLIO_v0.1.md)
 - [MVP Engineering Plan](docs/ENGINEERING_MVP_PLAN.md)
+- [Bench Test Checklist v0.1](docs/BENCH_TEST_CHECKLIST_v0.1.md)
+- [First Bench Bring-Up Guide v0.1](docs/FIRST_BENCH_BRINGUP_GUIDE_v0.1.md)
 - [Language Policy](docs/LANGUAGE_POLICY.md)
 
 ### Contracts and Protocols
@@ -27,3 +29,5 @@ Agnostic Global Nodal Evidence System — a **silent-first** architecture for cl
 
 - MVP is in the consolidated technical foundation phase (infrastructure + multi-target firmware + initial message contract).
 - Next milestone: real ESP-NOW integration + HUB Veto Engine with an append-only record trail.
+
+

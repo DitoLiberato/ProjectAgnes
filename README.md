@@ -70,6 +70,7 @@ Simulated evidence -> ESP-NOW real transport -> HUB node registry -> append-only
 
 - [MVP Engineering Portfolio](docs/ENGINEERING_MVP_PORTFOLIO_v0.1.md)
 - [MVP Engineering Plan](docs/ENGINEERING_MVP_PLAN.md)
+- [Future AI Supervisor Layer](docs/FUTURE_AI_SUPERVISOR_LAYER_v0.1.md)
 - [Bench Test Checklist v0.1](docs/BENCH_TEST_CHECKLIST_v0.1.md)
 - [First Bench Bring-Up Guide v0.1](docs/FIRST_BENCH_BRINGUP_GUIDE_v0.1.md)
 - [Development Log — 2026-02-21 First Wearable Bench PASS](docs/DEVELOPMENT_LOG_2026-02-21_FIRST_WEARABLE_BENCH_PASS.md)
@@ -187,6 +188,20 @@ Current firmware role:
 - emits HUB heartbeat;
 - renders basic heartbeat/status fields to the HMI.
 
+### Future AI Supervisor / Edge Intelligence Gateway
+
+A future post-MVP layer may add a more capable local edge computer, such as a Jetson-class device or equivalent AI-capable mini computer.
+
+This layer is planned as an **advisory supervisor**, not as the deterministic safety core. Its role would be to consume structured AGNES records and support:
+
+- consistency auditing across nodes;
+- event narrative reconstruction;
+- draft medical/nursing documentation;
+- Black Box replay;
+- hypothesis-support workflows based on validated evidence.
+
+The embedded ESP32 HUB remains the deterministic real-time coordinator. The AI Supervisor interprets, audits, summarizes, and suggests.
+
 ---
 
 ## 6. Message Contract
@@ -213,11 +228,17 @@ Planned message types:
 - `ack`
 - `error`
 
+Future post-MVP advisory record types may include:
+
+- `evidence_summary`
+- `advisory_record`
+- `draft_clinical_note`
+
 Protocol direction:
 
 - Keep the message contract stable and traceable.
 - Treat real sensors as producers of `Evidence`, not as direct alarm triggers.
-- Keep HUB logic independent from any specific display or future wearable/HUD output.
+- Keep HUB logic independent from any specific display, AI supervisor, cloud service, or future wearable/HUD output.
 
 ---
 
@@ -233,8 +254,9 @@ The current strategy is intentionally incremental:
 6. Render AGNES states on the Nextion HMI.
 7. Integrate real sensors one at a time.
 8. Run scenario-based validation with recorded evidence and decisions.
+9. Only after the embedded MVP is stable, evaluate an optional AI Supervisor / Edge Intelligence Gateway.
 
-This avoids confusing sensor noise with architecture failure.
+This avoids confusing sensor noise, AI behavior, or hardware acceleration with architecture failure.
 
 ---
 
@@ -270,6 +292,12 @@ Initial deterministic rules:
 - ECG lead-off -> `TECHNICAL_VETO: lead_disconnected`
 - Insufficient convergence -> `HOLD: uncertainty`
 
+### P4 — Future AI Supervisor planning only
+
+- Keep the AI Supervisor out of the MVP critical path.
+- Define record types and interface boundaries.
+- Preserve deterministic HUB autonomy if the AI layer is absent or unavailable.
+
 ---
 
 ## 9. Publication-Oriented Framing
@@ -287,6 +315,8 @@ It is intended to demonstrate:
 Potential publication framing:
 
 > A nodal subtractive-validation architecture for silent-first physiological monitoring: design rationale and early embedded prototype.
+
+A future technical manuscript may discuss the AI Supervisor as a planned extension for local narrative reconstruction, advisory interpretation, and documentation support. It should not be framed as autonomous diagnosis or as part of the MVP safety-critical loop.
 
 ---
 

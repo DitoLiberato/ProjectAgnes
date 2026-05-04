@@ -200,7 +200,21 @@ This layer is planned as an **advisory supervisor**, not as the deterministic sa
 - Black Box replay;
 - hypothesis-support workflows based on validated evidence.
 
-The embedded ESP32 HUB remains the deterministic real-time coordinator. The AI Supervisor interprets, audits, summarizes, and suggests.
+A preferred future pattern is:
+
+```text
+Structured Validator Model -> Narrative Model -> Output Validator
+```
+
+Practical current examples may include:
+
+- a Qwen-class model as the structured validator / JSON auditor;
+- a Gemma- or MedGemma-class model as the human-readable narrator;
+- a model-based or deterministic output validator to detect unsupported claims.
+
+This is a model-agnostic design: Qwen, Gemma, MedGemma, Llama, Mistral, Phi, or future local models are implementation choices, not architectural dependencies.
+
+The embedded ESP32 HUB remains the deterministic real-time coordinator. The AI Supervisor validates structure, interprets, audits, summarizes, and suggests.
 
 ---
 
@@ -231,6 +245,7 @@ Planned message types:
 Future post-MVP advisory record types may include:
 
 - `evidence_summary`
+- `verified_structured_summary`
 - `advisory_record`
 - `draft_clinical_note`
 
@@ -238,7 +253,7 @@ Protocol direction:
 
 - Keep the message contract stable and traceable.
 - Treat real sensors as producers of `Evidence`, not as direct alarm triggers.
-- Keep HUB logic independent from any specific display, AI supervisor, cloud service, or future wearable/HUD output.
+- Keep HUB logic independent from any specific display, AI supervisor, cloud service, model family, or future wearable/HUD output.
 
 ---
 
@@ -255,6 +270,7 @@ The current strategy is intentionally incremental:
 7. Integrate real sensors one at a time.
 8. Run scenario-based validation with recorded evidence and decisions.
 9. Only after the embedded MVP is stable, evaluate an optional AI Supervisor / Edge Intelligence Gateway.
+10. If AI supervision is explored, test a validator-narrator-output-validator pipeline using structured AGNES records only.
 
 This avoids confusing sensor noise, AI behavior, or hardware acceleration with architecture failure.
 
@@ -297,6 +313,9 @@ Initial deterministic rules:
 - Keep the AI Supervisor out of the MVP critical path.
 - Define record types and interface boundaries.
 - Preserve deterministic HUB autonomy if the AI layer is absent or unavailable.
+- Keep future AI integration model-agnostic.
+- Prefer structured validation before human-readable narration.
+- Require output validation before any advisory text is accepted into the record.
 
 ---
 
@@ -317,6 +336,14 @@ Potential publication framing:
 > A nodal subtractive-validation architecture for silent-first physiological monitoring: design rationale and early embedded prototype.
 
 A future technical manuscript may discuss the AI Supervisor as a planned extension for local narrative reconstruction, advisory interpretation, and documentation support. It should not be framed as autonomous diagnosis or as part of the MVP safety-critical loop.
+
+A possible future extension section may describe a serial, model-agnostic AI-supervision pattern:
+
+```text
+Structured Validator Model -> Narrative Model -> Output Validator
+```
+
+This preserves rigor by separating evidence validation, human-readable explanation, and unsupported-claim detection.
 
 ---
 
